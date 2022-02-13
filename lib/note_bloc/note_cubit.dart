@@ -1,21 +1,36 @@
 import 'dart:core';
 
 import 'package:bloc/bloc.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 part 'note_state.dart';
 
 class NoteCubit extends Cubit<NoteStates> {
   NoteCubit() : super(NoteInitialState());
 
+  get isBottomSheetShown => _isBottomSheetShown;
+
+  set isBottomSheetShown(value) {
+    _isBottomSheetShown = value;
+    _fabIcon = _isBottomSheetShown ? Icon(Icons.done) : Icon(Icons.add);
+    emit(NoteFabState());
+    print('fab icon is set ');
+  }
+
+  get fabIcon => _fabIcon;
   var _date;
   var _time;
   var _note;
+  var _isBottomSheetShown = false;
+  var _fabIcon = const Icon(Icons.add);
 
   static NoteCubit get(context) => BlocProvider.of(context);
 
   void setDate(String? date) {
-    _date = date;
+    _date = DateFormat("yyyy-MM-dd").format(DateTime.parse(date!));
     emit(NoteCreateState());
     print('date is set $date');
   }
@@ -35,6 +50,12 @@ class NoteCubit extends Cubit<NoteStates> {
   Note getNote() {
     return Note(_note, _time, _date);
   }
+
+  /* Icon getFabIcon() {
+    emit(NoteFabState());
+    print('fab icon is set ');
+    return _isBottomSheetShown ? Icon(Icons.done) : Icon(Icons.add);
+  }*/
 }
 
 class Note {

@@ -11,19 +11,16 @@ class BottomNavCarrier extends StatelessWidget {
   var _selectedIndex = 0;
   late Function(int) _onItemTapped;
   late var database;
-  bool isBottomSheetShown = false;
   var noteController = TextEditingController();
 
   var currentDate = DateTime.now();
+
   var lastDate;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> bottomNavScreens = [NewNotes(), DoneNotes(), ArchivedNotes()];
 
-  //initialize intl package to use it later for formatting time
-  //initializeDateFormatting();
-
-  //todo fix note text not saved,change fab icon when sheet is opened ,format date
+  //todo validate
 
   Future<Database> openDb() async {
     // open the database
@@ -90,32 +87,15 @@ class BottomNavCarrier extends StatelessWidget {
       builder: (context, state) {
         return Scaffold(
           key: scaffoldKey,
-          floatingActionButton: FloatingActionButton(
-              child: isBottomSheetShown ? Icon(Icons.done) : Icon(Icons.add),
-              onPressed: () {
-                if (isBottomSheetShown) {
-                  //user clicked to save the note
-                  BlocProvider.of<NoteCubit>(context)
-                      .setNote(noteController.value.toString());
-
-                  addNote(noteCubit);
-                  Navigator.pop(context);
-                } else {
-                  scaffoldKey.currentState!
-                      .showBottomSheet((context) {
-                        return AddNoteSheet(context, noteCubit);
-                      })
-                      .closed
-                      .then((value) {
-                        //this code will be activated if bottomsheet is closed
-                        //so that we change icon back to + incase user closes bottomsheet manually
-
-                        isBottomSheetShown = false;
-                      });
-                }
-
-                isBottomSheetShown = !isBottomSheetShown;
-              }),
+          floatingActionButton: BlocBuilder<NoteCubit, NoteStates>(
+            builder: (context, state) {
+              return FloatingActionButton(
+                  child: noteCubit.fabIcon,
+                  onPressed: () {
+                    onFabClick(context, noteCubit);
+                  });
+            },
+          ),
           body: bottomNavScreens[_selectedIndex],
           bottomNavigationBar: BottomNavigationBar(
             items: const [
@@ -138,6 +118,32 @@ class BottomNavCarrier extends StatelessWidget {
         );
       },
     );
+  }
+
+  void onFabClick(BuildContext context, NoteCubit noteCubit) {
+    print('note content is   ${noteController.value.text}');
+    if (noteCubit.isBottomSheetShown) {
+      //user clicked to save the note
+      noteCubit.setNote(noteController.value.text);
+
+      addNote(noteCubit);
+      Navigator.pop(context);
+      noteCubit.isBottomSheetShown = false;
+    } else {
+      scaffoldKey.currentState!
+          .showBottomSheet((context) {
+            return AddNoteSheet(context, noteCubit);
+          })
+          .closed
+          .then((value) {
+            //this code will be activated if bottomsheet is closed
+            //so that we change icon back to + incase user closes bottomsheet manually
+
+            noteCubit.isBottomSheetShown = false;
+          });
+    }
+
+    noteCubit.isBottomSheetShown = true;
   }
 
   Widget AddNoteSheet(BuildContext context, NoteCubit noteCubit) {
