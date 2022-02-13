@@ -9,6 +9,7 @@ DefaultFormField(
   TextInputType? keyboardType,
   GestureTapCallback? onFieldTap,
   bool? isReadOnly,
+  FormFieldValidator? validator,
 }) {
   return TextFormField(
     onTap: onFieldTap,
@@ -16,6 +17,7 @@ DefaultFormField(
     controller: controller,
     obscureText: obscureText,
     readOnly: isReadOnly ?? false,
+    validator: validator,
     decoration: InputDecoration(
       prefixIcon: prefixIcon,
       suffixIcon: suffixIcon,
