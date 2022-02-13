@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:sqflite/sqflite.dart';
 
 part 'note_state.dart';
 
@@ -32,6 +33,9 @@ class NoteCubit extends Cubit<NoteStates> {
   var _isBottomSheetShown = false;
   var _fabIcon = const Icon(Icons.add);
 
+  late var database;
+  late List<Map> noteList = [];
+
   static NoteCubit get(context) => BlocProvider.of(context);
 
   void setDate(String? date) {
@@ -57,6 +61,50 @@ class NoteCubit extends Cubit<NoteStates> {
   Note getNote() {
     return Note(_note, _time, _date);
   }
+
+  Future<Database> openDb() async {
+    // open the database
+    database = await openDatabase('notes_db.db', version: 2,
+        onCreate: (Database db, int version) async {
+      // When creating the db, create the table
+      await db.execute(
+          'CREATE TABLE Notes (id INTEGER PRIMARY KEY, content TEXT, date TEXT, time TEXT, state TEXT)');
+    });
+    return database;
+  }
+
+  void addNote(NoteCubit noteCubit) async {
+    // Insert some records in a transaction
+
+    openDb().then((db) {
+      db.transaction((txn) async {
+        int id = await txn.rawInsert(
+            'INSERT INTO Notes(content, date, time, state) VALUES("${noteCubit.getNote().note}", "${noteCubit.getNote().date}", "${noteCubit.getNote().time}", "new")');
+        print('inserted1: $id');
+        getNotes();
+      });
+    });
+  }
+
+  void getNotes() async {
+    // Get the records
+    openDb().then((db) async {
+      {
+        noteList = await db.rawQuery('SELECT * FROM Notes');
+        emit(NewNotesState());
+      }
+    });
+  }
+
+/*  void deleteNote(int id) async {
+    // Get the records
+    openDb().then((db) async {
+      {
+        await database
+            .rawDelete('DELETE FROM Notes WHERE id = ?');
+      }
+    });
+  }*/
 
   /* Icon getFabIcon() {
     emit(NoteFabState());

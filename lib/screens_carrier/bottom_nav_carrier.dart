@@ -10,7 +10,6 @@ import 'package:todo_flutter/shared/reusable_components.dart';
 class BottomNavCarrier extends StatelessWidget {
   var _selectedIndex = 0;
   late Function(int) _onItemTapped;
-  late var database;
 
   var currentDate = DateTime.now();
 
@@ -21,58 +20,15 @@ class BottomNavCarrier extends StatelessWidget {
 
   //todo validate
 
-  Future<Database> openDb() async {
-    // open the database
-    database = await openDatabase('notes_db.db', version: 2,
-        onCreate: (Database db, int version) async {
-      // When creating the db, create the table
-      await db.execute(
-          'CREATE TABLE Notes (id INTEGER PRIMARY KEY, content TEXT, date TEXT, time TEXT, state TEXT)');
-    });
-    return database;
-  }
-
   /*currentTime = DateFormat("HH:mm").format(DateTime.now());
   currentDate = DateFormat("yyyy-MM-dd").format(DateTime.now());*/
-
-  void getNotes() async {
-    // Get the records
-    openDb().then((db) async {
-      {
-        List<Map> list = await db.rawQuery('SELECT * FROM Notes');
-        print(list);
-      }
-    });
-  }
-
-/*  void deleteNote(int id) async {
-    // Get the records
-    openDb().then((db) async {
-      {
-        await database
-            .rawDelete('DELETE FROM Notes WHERE id = ?');
-      }
-    });
-  }*/
-
-  void addNote(NoteCubit noteCubit) async {
-    // Insert some records in a transaction
-
-    openDb().then((db) {
-      db.transaction((txn) async {
-        int id = await txn.rawInsert(
-            'INSERT INTO Notes(content, date, time, state) VALUES("${noteCubit.getNote().note}", "${noteCubit.getNote().date}", "${noteCubit.getNote().time}", "new")');
-        print('inserted1: $id');
-        getNotes();
-      });
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     //get max allowed date in datepicker
     lastDate = currentDate.add(Duration(days: 365 * 3));
     var noteCubit = NoteCubit.get(context);
+    NoteCubit.get(context).openDb();
 
 //forkey for validation
     final _formKey = GlobalKey<FormState>();
@@ -131,7 +87,7 @@ class BottomNavCarrier extends StatelessWidget {
 //only add note to db if the validation was successful
       if (formKey.currentState!.validate()) {
         print('validated success');
-        addNote(noteCubit);
+        noteCubit.addNote(noteCubit);
         Navigator.pop(context);
         noteCubit.isBottomSheetShown = false;
       }

@@ -33,6 +33,21 @@ PickerRow(
   return;
 }
 
+NoteItem(
+    {@required String? note, @required String? time, @required String? date}) {
+  return Row(
+    children: [
+      Text('$note'),
+      Column(
+        children: [
+          Text('$time'),
+          Text('$date'),
+        ],
+      )
+    ],
+  );
+}
+
 _showTimePicker(var context) async {}
 
 _showDatePicker(var context) async {}

@@ -7,3 +7,5 @@ class NoteInitialState extends NoteStates {}
 class NoteCreateState extends NoteStates {}
 
 class NoteFabState extends NoteStates {}
+
+class NewNotesState extends NoteStates {}
