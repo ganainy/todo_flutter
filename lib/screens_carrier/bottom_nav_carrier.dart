@@ -59,13 +59,13 @@ class BottomNavCarrier extends StatelessWidget {
     });
   }*/
 
-  void addNote(NoteState state) async {
+  void addNote(NoteCubit noteCubit) async {
     // Insert some records in a transaction
 
     openDb().then((db) {
       db.transaction((txn) async {
         int id = await txn.rawInsert(
-            'INSERT INTO Notes(content, date, time, state) VALUES("${state.note}", "${state.date}", "${state.time}", "new")');
+            'INSERT INTO Notes(content, date, time, state) VALUES("${noteCubit.getNote().note}", "${noteCubit.getNote().date}", "${noteCubit.getNote().time}", "new")');
         print('inserted1: $id');
         getNotes();
       });
@@ -76,13 +76,14 @@ class BottomNavCarrier extends StatelessWidget {
   Widget build(BuildContext context) {
     //get max allowed date in datepicker
     lastDate = currentDate.add(Duration(days: 365 * 3));
+    var noteCubit = NoteCubit.get(context);
 
     //on click of bottomsheet items
     _onItemTapped = (index) {
       _selectedIndex = index;
     };
 
-    return BlocConsumer<NoteCubit, NoteState>(
+    return BlocConsumer<NoteCubit, NoteStates>(
       listener: (context, state) {
         // TODO: implement listener
       },
@@ -97,12 +98,12 @@ class BottomNavCarrier extends StatelessWidget {
                   BlocProvider.of<NoteCubit>(context)
                       .setNote(noteController.value.toString());
 
-                  addNote(state);
+                  addNote(noteCubit);
                   Navigator.pop(context);
                 } else {
                   scaffoldKey.currentState!
                       .showBottomSheet((context) {
-                        return AddNoteSheet(context, state);
+                        return AddNoteSheet(context, noteCubit);
                       })
                       .closed
                       .then((value) {
@@ -139,7 +140,7 @@ class BottomNavCarrier extends StatelessWidget {
     );
   }
 
-  Widget AddNoteSheet(BuildContext context, NoteState state) {
+  Widget AddNoteSheet(BuildContext context, NoteCubit noteCubit) {
     return Container(
       padding: EdgeInsets.all(20),
       margin: EdgeInsets.all(8),
@@ -166,9 +167,10 @@ class BottomNavCarrier extends StatelessWidget {
                     const SizedBox(
                       width: 8,
                     ),
-                    BlocBuilder<NoteCubit, NoteState>(
+                    BlocBuilder<NoteCubit, NoteStates>(
                       builder: (context, state) {
-                        return Text(state.time ?? 'Select note time');
+                        return Text(
+                            noteCubit.getNote().time ?? 'Select note time');
                       },
                     ),
                   ],
@@ -192,9 +194,10 @@ class BottomNavCarrier extends StatelessWidget {
                     const SizedBox(
                       width: 8,
                     ),
-                    BlocBuilder<NoteCubit, NoteState>(
+                    BlocBuilder<NoteCubit, NoteStates>(
                       builder: (context, state) {
-                        return Text(state.date ?? 'Select note date');
+                        return Text(
+                            noteCubit.getNote().date ?? 'Select note date');
                       },
                     )
                   ],

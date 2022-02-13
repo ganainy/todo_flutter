@@ -1,10 +1,9 @@
 part of 'note_cubit.dart';
 
-class NoteState {
-  var date;
-  var time;
-  var note;
-  var isNewNoteAdded;
+abstract class NoteStates {}
 
-  NoteState({this.date, this.time, this.note, this.isNewNoteAdded});
-}
+class NoteInitialState extends NoteStates {}
+
+class NoteCreateState extends NoteStates {}
+
+class NoteFabState extends NoteStates {}
