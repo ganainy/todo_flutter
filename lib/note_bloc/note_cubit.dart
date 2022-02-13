@@ -11,6 +11,11 @@ part 'note_state.dart';
 class NoteCubit extends Cubit<NoteStates> {
   NoteCubit() : super(NoteInitialState());
 
+  var noteController = TextEditingController();
+  var timeController = TextEditingController();
+
+  var dateController = TextEditingController();
+
   get isBottomSheetShown => _isBottomSheetShown;
 
   set isBottomSheetShown(value) {
@@ -31,12 +36,14 @@ class NoteCubit extends Cubit<NoteStates> {
 
   void setDate(String? date) {
     _date = DateFormat("yyyy-MM-dd").format(DateTime.parse(date!));
+    dateController.text = _date;
     emit(NoteCreateState());
     print('date is set $date');
   }
 
   void setTime(String? time) {
     _time = time;
+    timeController.text = time ?? '';
     emit(NoteCreateState());
     print('time is set $time');
   }

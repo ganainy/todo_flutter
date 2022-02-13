@@ -11,7 +11,6 @@ class BottomNavCarrier extends StatelessWidget {
   var _selectedIndex = 0;
   late Function(int) _onItemTapped;
   late var database;
-  var noteController = TextEditingController();
 
   var currentDate = DateTime.now();
 
@@ -121,10 +120,9 @@ class BottomNavCarrier extends StatelessWidget {
   }
 
   void onFabClick(BuildContext context, NoteCubit noteCubit) {
-    print('note content is   ${noteController.value.text}');
     if (noteCubit.isBottomSheetShown) {
       //user clicked to save the note
-      noteCubit.setNote(noteController.value.text);
+      noteCubit.setNote(noteCubit.noteController.value.text);
 
       addNote(noteCubit);
       Navigator.pop(context);
@@ -155,59 +153,41 @@ class BottomNavCarrier extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          DefaultFormField('Enter your note', noteController,
+          DefaultFormField('Enter your note', noteCubit.noteController,
               prefixIcon: const Icon(Icons.event_note)),
           Container(
             margin: EdgeInsets.all(12),
-            child: GestureDetector(
-                onTap: () async => await showTimePicker(
-                      context: context,
-                      initialTime: TimeOfDay.now(),
-                    ).then((selectedTime) {
-                      BlocProvider.of<NoteCubit>(context)
-                          .setTime(selectedTime?.format(context));
-                    }),
-                child: Row(
-                  children: [
-                    Icon(Icons.access_time_outlined),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    BlocBuilder<NoteCubit, NoteStates>(
-                      builder: (context, state) {
-                        return Text(
-                            noteCubit.getNote().time ?? 'Select note time');
-                      },
-                    ),
-                  ],
-                )),
+            child: DefaultFormField(
+                'Select note time', noteCubit.timeController,
+                prefixIcon: Icon(Icons.access_time_outlined),
+                isReadOnly: true, onFieldTap: () async {
+              //on tap on the field should show time picker
+              await showTimePicker(
+                context: context,
+                initialTime: TimeOfDay.now(),
+              ).then((selectedTime) {
+                BlocProvider.of<NoteCubit>(context)
+                    .setTime(selectedTime?.format(context));
+              });
+            }),
           ),
           Container(
             margin: EdgeInsets.all(12),
-            child: GestureDetector(
-                onTap: () async => await showDatePicker(
-                      context: context,
-                      initialDate: currentDate,
-                      firstDate: currentDate,
-                      lastDate: lastDate,
-                    ).then((selectedDate) {
-                      BlocProvider.of<NoteCubit>(context)
-                          .setDate(selectedDate.toString());
-                    }),
-                child: Row(
-                  children: [
-                    Icon(Icons.calendar_today),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    BlocBuilder<NoteCubit, NoteStates>(
-                      builder: (context, state) {
-                        return Text(
-                            noteCubit.getNote().date ?? 'Select note date');
-                      },
-                    )
-                  ],
-                )),
+            child: DefaultFormField(
+                'Select note date', noteCubit.dateController,
+                prefixIcon: const Icon(Icons.calendar_today),
+                isReadOnly: true, onFieldTap: () async {
+              //on tap on the field should show time picker
+              await showDatePicker(
+                context: context,
+                initialDate: currentDate,
+                firstDate: currentDate,
+                lastDate: lastDate,
+              ).then((selectedDate) {
+                BlocProvider.of<NoteCubit>(context)
+                    .setDate(selectedDate.toString());
+              });
+            }),
           ),
         ],
       ),

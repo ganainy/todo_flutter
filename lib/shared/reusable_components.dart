@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 
-DefaultFormField(String labelText, TextEditingController controller,
-    {bool obscureText = false,
-    Icon? prefixIcon,
-    Icon? suffixIcon,
-    TextInputType? keyboardType}) {
+DefaultFormField(
+  String labelText,
+  TextEditingController controller, {
+  bool obscureText = false,
+  Icon? prefixIcon,
+  Icon? suffixIcon,
+  TextInputType? keyboardType,
+  GestureTapCallback? onFieldTap,
+  bool? isReadOnly,
+}) {
   return TextFormField(
+    onTap: onFieldTap,
     keyboardType: keyboardType,
     controller: controller,
     obscureText: obscureText,
+    readOnly: isReadOnly ?? false,
     decoration: InputDecoration(
       prefixIcon: prefixIcon,
       suffixIcon: suffixIcon,
