@@ -16,11 +16,6 @@ class BottomNavCarrier extends StatelessWidget {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> bottomNavScreens = [NewNotes(), DoneNotes(), ArchivedNotes()];
 
-  //todo validate
-
-  /*currentTime = DateFormat("HH:mm").format(DateTime.now());
-  currentDate = DateFormat("yyyy-MM-dd").format(DateTime.now());*/
-
   @override
   Widget build(BuildContext context) {
     //get max allowed date in datepicker
@@ -37,9 +32,7 @@ class BottomNavCarrier extends StatelessWidget {
     };
 
     return BlocConsumer<NoteCubit, NoteStates>(
-      listener: (context, state) {
-        // TODO: implement listener
-      },
+      listener: (context, state) {},
       builder: (context, state) {
         return Scaffold(
           key: scaffoldKey,

@@ -19,19 +19,38 @@ class _DoneNotesState extends State<DoneNotes> {
     return BlocConsumer<NoteCubit, NoteStates>(
       listener: (context, state) {},
       builder: (context, state) {
-        return Container(
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              return NoteItem(
-                  note: noteCubit.doneNoteList.elementAt(index)['content'],
-                  time: noteCubit.doneNoteList.elementAt(index)['time'],
-                  date: noteCubit.doneNoteList.elementAt(index)['date'],
-                  context: context,
-                  noteId: noteCubit.doneNoteList.elementAt(index)['id']);
-            },
-            itemCount: noteCubit.doneNoteList.length,
-          ),
-        );
+        return noteCubit.doneNoteList.isEmpty
+            ? Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'No done notes found',
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Icon(Icons.note_add_rounded)
+                  ],
+                ))
+            : ListView.builder(
+                itemBuilder: (context, index) {
+                  return NoteItem(
+                      note: noteCubit.doneNoteList.elementAt(index)['content'],
+                      time: noteCubit.doneNoteList.elementAt(index)['time'],
+                      date: noteCubit.doneNoteList.elementAt(index)['date'],
+                      context: context,
+                      noteId: noteCubit.doneNoteList.elementAt(index)['id']);
+                },
+                itemCount: noteCubit.doneNoteList.length,
+              );
       },
     );
   }

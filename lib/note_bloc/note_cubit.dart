@@ -145,21 +145,27 @@ class NoteCubit extends Cubit<NoteStates> {
     });
   }
 
-/*  void deleteNote(int id) async {
+  void deleteNote(int noteId) async {
     // Get the records
     openDb().then((db) async {
       {
-        await database
-            .rawDelete('DELETE FROM Notes WHERE id = ?');
+        await database.rawDelete(
+            'DELETE FROM Notes WHERE id = ?', [noteId]).then((value) {
+          //get notes again after state change to update ui with the new notes
+          getDoneNotes();
+          getArchivedNotes();
+          getNewNotes();
+          emit(NoteDeleteState());
+        });
       }
     });
-  }*/
+  }
 
-  /* Icon getFabIcon() {
+  Icon getFabIcon() {
     emit(NoteFabState());
     print('fab icon is set ');
     return _isBottomSheetShown ? Icon(Icons.done) : Icon(Icons.add);
-  }*/
+  }
 }
 
 class Note {

@@ -19,19 +19,41 @@ class _NewNotesState extends State<NewNotes> {
     return BlocConsumer<NoteCubit, NoteStates>(
       listener: (context, state) {},
       builder: (context, state) {
-        return Container(
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              return NoteItem(
-                  note: noteCubit.newNoteList.elementAt(index)['content'],
-                  time: noteCubit.newNoteList.elementAt(index)['time'],
-                  date: noteCubit.newNoteList.elementAt(index)['date'],
-                  context: context,
-                  noteId: noteCubit.newNoteList.elementAt(index)['id']);
-            },
-            itemCount: noteCubit.newNoteList.length,
-          ),
-        );
+        return Container(child: (() {
+          if (noteCubit.newNoteList.isNotEmpty) {
+            return ListView.builder(
+              itemBuilder: (context, index) {
+                return NoteItem(
+                    note: noteCubit.newNoteList.elementAt(index)['content'],
+                    time: noteCubit.newNoteList.elementAt(index)['time'],
+                    date: noteCubit.newNoteList.elementAt(index)['date'],
+                    context: context,
+                    noteId: noteCubit.newNoteList.elementAt(index)['id']);
+              },
+              itemCount: noteCubit.newNoteList.length,
+            );
+          } else {
+            return Container(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'No new notes found, click the add button to add more',
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Icon(Icons.note_add_rounded)
+                  ],
+                ));
+          }
+        })());
       },
     );
   }

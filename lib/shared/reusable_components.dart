@@ -40,57 +40,63 @@ NoteItem(
     @required String? time,
     @required String? date,
     @required BuildContext? context}) {
-  return Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CircleAvatar(
-          backgroundColor: Colors.blue,
-          radius: 25,
-          child: Text(
-            '$time',
-          ),
-        ),
-        SizedBox(
-          width: 10,
-        ),
-        Expanded(
+  return Dismissible(
+    onDismissed: (dismissDirection) {
+      NoteCubit.get(context).deleteNote(noteId!);
+    },
+    key: Key(noteId.toString()),
+    child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            backgroundColor: Colors.blue,
+            radius: 25,
             child: Text(
-          '$note',
-          style: TextStyle(fontSize: 20),
-        )),
-        Column(
-          children: [
-            Text(
-              '$date',
-              style: TextStyle(color: Colors.grey[700]),
+              '$time',
             ),
-            Row(
-              children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.assignment_turned_in,
-                    color: Colors.green,
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Expanded(
+              child: Text(
+            '$note',
+            style: TextStyle(fontSize: 20),
+          )),
+          Column(
+            children: [
+              Text(
+                '$date',
+                style: TextStyle(color: Colors.grey[700]),
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.assignment_turned_in,
+                      color: Colors.green,
+                    ),
+                    onPressed: () {
+                      NoteCubit.get(context).updateNote('done', noteId!);
+                    },
                   ),
-                  onPressed: () {
-                    NoteCubit.get(context).updateNote('done', noteId!);
-                  },
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.archive,
-                    color: Colors.grey,
+                  IconButton(
+                    icon: Icon(
+                      Icons.archive,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      NoteCubit.get(context).updateNote('archived', noteId!);
+                    },
                   ),
-                  onPressed: () {
-                    NoteCubit.get(context).updateNote('archived', noteId!);
-                  },
-                ),
-              ],
-            )
-          ],
-        )
-      ],
+                ],
+              )
+            ],
+          )
+        ],
+      ),
     ),
   );
 }
