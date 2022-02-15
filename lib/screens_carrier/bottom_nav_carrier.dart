@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:todo_flutter/note_bloc/note_cubit.dart';
 import 'package:todo_flutter/screens/archived_notes.dart';
 import 'package:todo_flutter/screens/done_notes.dart';
@@ -8,7 +7,6 @@ import 'package:todo_flutter/screens/new_notes.dart';
 import 'package:todo_flutter/shared/reusable_components.dart';
 
 class BottomNavCarrier extends StatelessWidget {
-  var _selectedIndex = 0;
   late Function(int) _onItemTapped;
 
   var currentDate = DateTime.now();
@@ -30,12 +28,12 @@ class BottomNavCarrier extends StatelessWidget {
     var noteCubit = NoteCubit.get(context);
     NoteCubit.get(context).openDb();
 
-//forkey for validation
+//formkey for validation
     final _formKey = GlobalKey<FormState>();
 
     //on click of bottomsheet items
     _onItemTapped = (index) {
-      _selectedIndex = index;
+      noteCubit.selectedIndex = index;
     };
 
     return BlocConsumer<NoteCubit, NoteStates>(
@@ -54,7 +52,7 @@ class BottomNavCarrier extends StatelessWidget {
                   });
             },
           ),
-          body: bottomNavScreens[_selectedIndex],
+          body: bottomNavScreens[noteCubit.selectedIndex],
           bottomNavigationBar: BottomNavigationBar(
             items: const [
               BottomNavigationBarItem(
@@ -70,7 +68,7 @@ class BottomNavCarrier extends StatelessWidget {
                 label: "Archived",
               ),
             ],
-            currentIndex: _selectedIndex,
+            currentIndex: noteCubit.selectedIndex,
             onTap: _onItemTapped,
           ),
         );

@@ -15,21 +15,21 @@ class _NewNotesState extends State<NewNotes> {
   Widget build(BuildContext context) {
     var noteCubit = NoteCubit.get(context);
     //TODO: zbt amaken astd3a2 al initiatedb w getnotes
-    noteCubit.getNotes();
+    noteCubit.getNewNotes();
     return BlocConsumer<NoteCubit, NoteStates>(
-      listener: (context, state) {
-        // TODO: implement listener
-      },
+      listener: (context, state) {},
       builder: (context, state) {
         return Container(
           child: ListView.builder(
             itemBuilder: (context, index) {
               return NoteItem(
-                  note: noteCubit.noteList.elementAt(index)['content'],
-                  time: noteCubit.noteList.elementAt(index)['time'],
-                  date: noteCubit.noteList.elementAt(index)['date']);
+                  note: noteCubit.newNoteList.elementAt(index)['content'],
+                  time: noteCubit.newNoteList.elementAt(index)['time'],
+                  date: noteCubit.newNoteList.elementAt(index)['date'],
+                  context: context,
+                  noteId: noteCubit.newNoteList.elementAt(index)['id']);
             },
-            itemCount: noteCubit.noteList.length,
+            itemCount: noteCubit.newNoteList.length,
           ),
         );
       },

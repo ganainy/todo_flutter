@@ -21,8 +21,10 @@ class NoteCubit extends Cubit<NoteStates> {
 
   set isBottomSheetShown(value) {
     _isBottomSheetShown = value;
-    _fabIcon = _isBottomSheetShown ? Icon(Icons.done) : Icon(Icons.add);
+    _fabIcon =
+        _isBottomSheetShown ? const Icon(Icons.done) : const Icon(Icons.add);
     emit(NoteFabState());
+
     print('fab icon is set ');
   }
 
@@ -32,9 +34,19 @@ class NoteCubit extends Cubit<NoteStates> {
   var _note;
   var _isBottomSheetShown = false;
   var _fabIcon = const Icon(Icons.add);
+  var _selectedIndex = 0;
 
-  late var database;
-  late List<Map> noteList = [];
+  late Database database;
+  late List<Map> newNoteList = [];
+  late List<Map> doneNoteList = [];
+  late List<Map> archivedNoteList = [];
+
+  set selectedIndex(value) {
+    _selectedIndex = value;
+    emit(BottomNavState());
+  }
+
+  get selectedIndex => _selectedIndex;
 
   static NoteCubit get(context) => BlocProvider.of(context);
 
@@ -81,18 +93,55 @@ class NoteCubit extends Cubit<NoteStates> {
         int id = await txn.rawInsert(
             'INSERT INTO Notes(content, date, time, state) VALUES("${noteCubit.getNote().note}", "${noteCubit.getNote().date}", "${noteCubit.getNote().time}", "new")');
         print('inserted1: $id');
-        getNotes();
+        getNewNotes();
       });
     });
   }
 
-  void getNotes() async {
+  void getArchivedNotes() async {
     // Get the records
     openDb().then((db) async {
       {
-        noteList = await db.rawQuery('SELECT * FROM Notes');
+        archivedNoteList = await db
+            .rawQuery('SELECT * FROM Notes WHERE state = ?', ['archived']);
+        emit(ArchivedNotesState());
+      }
+    });
+  }
+
+  void getDoneNotes() async {
+    // Get the records
+    openDb().then((db) async {
+      {
+        doneNoteList =
+            await db.rawQuery('SELECT * FROM Notes WHERE state = ?', ['done']);
+        emit(DoneNotesState());
+      }
+    });
+  }
+
+  void getNewNotes() async {
+    // Get the records
+    openDb().then((db) async {
+      {
+        newNoteList =
+            await db.rawQuery('SELECT * FROM Notes WHERE state = ?', ['new']);
         emit(NewNotesState());
       }
+    });
+  }
+
+  void updateNote(String state, int noteId) async {
+    database.rawUpdate('UPDATE Notes SET state = ? WHERE id = ?',
+        ['$state', noteId]).then((value) {
+      print('update note success');
+      emit(NoteUpdateState());
+      //get notes again after state change to update ui with the new notes
+      getDoneNotes();
+      getArchivedNotes();
+      getNewNotes();
+    }).onError((error, stackTrace) {
+      print('update note error:${error.toString()}');
     });
   }
 
